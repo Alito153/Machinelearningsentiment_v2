@@ -523,57 +523,91 @@ $$
 
 
 
-9. Implémentation Technique
-9.1 Stack Technologique
-Data Collection :
+## 9. Implémentation Technique
 
-Forex Factory : Python Selenium + BeautifulSoup
-Dukascopy : dukascopy-node CLI / Node.js API
-VIX : yfinance Python library
+### 9.1 Stack Technologique
 
-Feature Engineering :
+#### **Data Collection**
+- **Forex Factory** : Python Selenium + BeautifulSoup  
+- **Dukascopy** : `dukascopy-node` (CLI) / API Node.js  
+- **VIX** : Librairie Python `yfinance`  
 
-pandas, numpy : Manipulation de données
-ta-lib : Indicateurs techniques (ATR)
+#### **Feature Engineering**
+- `pandas`, `numpy` : manipulation avancée des données  
+- `ta-lib` : indicateurs techniques (ATR, RSI, etc.)  
 
-ML Training :
+#### **ML Training**
+- **Scikit-learn** : Random Forest  
+- **XGBoost / LightGBM** : Gradient Boosting  
+- **SHAP** : interprétabilité des modèles  
 
-Scikit-learn : Random Forest
-XGBoost / LightGBM : Gradient Boosting
-SHAP : Explainabilité des modèles
+#### **Deep Learning**
+- **TensorFlow / PyTorch** : réseaux LSTM  
+- **Keras** : prototypage rapide  
 
-Deep Learning :
+#### **Backtesting**
+- **backtrader** : framework complet  
+- **Moteur vectorisé custom** : pour des tests en batch ultra-rapides  
 
-TensorFlow / PyTorch : Implémentation LSTM
-Keras : API haut niveau pour prototypage rapide
+#### **Live Execution**
+- **MetaTrader 5** : via la librairie Python `MetaTrader5`  
+- **Broker** : Exness (low latency, spreads bas)  
 
-Backtesting :
+---
 
-backtrader : Framework de backtesting
-Custom vectorized engine : Pour tests rapides
+### 9.3 Architecture du Système en Production
 
-Live Execution :
+#### **Pipeline temps réel**
 
-MetaTrader 5 : Via MetaTrader5 Python library
-Broker : Exness (low latency, spreads compétitifs)
+1. **Monitoring Forex Factory**  
+   Scraping continu des événements *à venir*, avec un horizon glissant de 15 minutes.
+
+2. **Prédiction LSTM de volatilité**  
+   Calcul de :
+
+   $$
+   \hat{V}_{\text{LSTM}}
+   $$
+
+   sur les dernières données **M1**, pour l’instant \( t_0 - 5 \text{ min} \).
+
+3. **Feature Engineering**  
+   Construction du vecteur :
+
+   $$
+   X = \{\text{surprise normalisée},\ \text{sentiment},\ \text{VIX},\ \hat{V}_{\text{LSTM}},\ \dots\}
+   $$
+
+4. **Prédiction ML**  
+   - Classification **spike / no spike**  
+   - Classification **direction** (up / down)
+
+5. **Calibration dynamique**  
+   Ajustement du TP/SL en fonction de la volatilité LSTM :
+
+   $$
+   \text{TP/SL}_{\text{final}} = f(\hat{V}_{\text{LSTM}})
+   $$
+
+6. **Ordre MT5**  
+   Envoi automatique si *toutes* les conditions sont validées par le modèle.
+
+7. **Monitoring positions**  
+   - Mise à jour dynamique des SL/TP  
+   - Fermeture par timeout  
+   - Vérification de cohérence de spread, latence et volatilité
+
+---
+
+### **Latence cible du système**
+
+$$
+\text{Latence totale} < 200\ \text{ms}
+$$
+
+Entre **publication de la news** et **envoi de l’ordre**.
 
 
-9.3 Architecture du Système en Production
-Pipeline temps réel :
-
-Monitoring Forex Factory : Scraping continu des événements à venir (15 min d'avance)
-Prédiction LSTM : Calcul de V^LSTM\hat{V}_{\text{LSTM}}
-V^LSTM​ à t₀-5min sur données M1 récentes
-
-Feature Engineering : Construction de XX
-X incluant surprise, sentiment, VIX, LSTM
-
-Prédiction ML : Classification spike + direction
-Calibration dynamique : TP/SL ajustés par volatilité LSTM
-Ordre MT5 : Envoi automatique si tous critères validés
-Monitoring positions : Gestion TP/SL/timeout en temps réel
-
-Latence cible : < 200ms entre publication news et envoi ordre
 
 10. Protocole Anti-Overfitting
 10.1 Comptabilisation des Essais
