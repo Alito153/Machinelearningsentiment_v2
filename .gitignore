@@ -1,0 +1,29 @@
+# ===== IGNORER LES GROS FICHIERS =====
+
+# Datasets bruts
+data/raw/
+
+# Datasets préparés
+data/processed/
+
+# Résultats du backtest
+backtesting/results/
+
+# Visualisations volumineuses
+analysis/visualizations/
+
+# Modèles ML (.pkl)
+models/
+
+# Checkpoints, logs, artefacts
+*.pkl
+*.h5
+*.pt
+*.zip
+
+# ===== IGNORER LES ENVIRONNEMENTS LOCAUX =====
+*.pyc
+__pycache__/
+.ipynb_checkpoints/
+.env/
+.vscode/
