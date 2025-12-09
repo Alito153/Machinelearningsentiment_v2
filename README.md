@@ -557,7 +557,7 @@ $$
 
 ### 9.3 Architecture du Système en Production
 
-#### **Pipeline temps réel**
+#### Pipeline temps réel
 
 1. **Monitoring Forex Factory**  
    Scraping continu des événements *à venir*, avec un horizon glissant de 15 minutes.
@@ -565,9 +565,47 @@ $$
 2. **Prédiction LSTM de volatilité**  
    Calcul de :
 
-```math
+$$
 \hat{V}_{\text{LSTM}}
+$$
 
+   sur les dernières données M1, pour l’instant \( t_0 - 5 \) minutes.
+
+3. **Feature Engineering**  
+   Construction du vecteur :
+
+$$
+X = \{\text{surprise normalisée},\ \text{sentiment},\ \text{VIX},\ \hat{V}_{\text{LSTM}},\ \dots\}
+$$
+
+4. **Prédiction ML**  
+   - Classification *spike / no spike*  
+   - Classification *direction* (up / down)
+
+5. **Calibration dynamique**  
+   Ajustement du TP/SL selon la volatilité prédite :
+
+$$
+\text{TP/SL}_{\text{final}} = f(\hat{V}_{\text{LSTM}})
+$$
+
+6. **Ordre MT5**  
+   Exécution automatique si toutes les conditions sont validées.
+
+7. **Monitoring positions**  
+   - Ajustement dynamique des SL/TP  
+   - Fermeture par timeout  
+   - Vérification du spread, de la latence et de la volatilité
+
+---
+
+### Latence cible du système
+
+$$
+\text{Latence totale} < 200\ \text{ms}
+$$
+
+Entre *publication de la news* et *envoi de l’ordre*.
 
 
 
