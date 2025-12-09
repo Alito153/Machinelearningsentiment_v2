@@ -565,47 +565,9 @@ $$
 2. **Prédiction LSTM de volatilité**  
    Calcul de :
 
-   $$
-   \hat{V}_{\text{LSTM}}
-   $$
+```math
+\hat{V}_{\text{LSTM}}
 
-   sur les dernières données **M1**, pour l’instant \( t_0 - 5 \text{ min} \).
-
-3. **Feature Engineering**  
-   Construction du vecteur :
-
-   $$
-   X = \{\text{surprise normalisée},\ \text{sentiment},\ \text{VIX},\ \hat{V}_{\text{LSTM}},\ \dots\}
-   $$
-
-4. **Prédiction ML**  
-   - Classification **spike / no spike**  
-   - Classification **direction** (up / down)
-
-5. **Calibration dynamique**  
-   Ajustement du TP/SL en fonction de la volatilité LSTM :
-
-   $$
-   \text{TP/SL}_{\text{final}} = f(\hat{V}_{\text{LSTM}})
-   $$
-
-6. **Ordre MT5**  
-   Envoi automatique si *toutes* les conditions sont validées par le modèle.
-
-7. **Monitoring positions**  
-   - Mise à jour dynamique des SL/TP  
-   - Fermeture par timeout  
-   - Vérification de cohérence de spread, latence et volatilité
-
----
-
-### **Latence cible du système**
-
-$$
-\text{Latence totale} < 200\ \text{ms}
-$$
-
-Entre **publication de la news** et **envoi de l’ordre**.
 
 
 
