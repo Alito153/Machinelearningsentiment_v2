@@ -321,36 +321,97 @@ Edge statistique de +8%, exploitable après coûts de transaction sur paires liq
 
 ### 8.3 Prédiction de Volatilité par LSTM
 
-**Théorème d'approximation universelle pour RNN
-:** Un réseau LSTM avec suffisamment de neurones cachés peut approximer toute fonction mesurable f:RT→Rf : \mathbb{R}^T \to \mathbb{R}
-f:RT→R (Schäfer & Zimmermann, 2006).
+**Théorème d'approximation universelle pour RNN :**  
+Un réseau LSTM avec suffisamment de neurones cachés peut approximer toute fonction mesurable :
 
-Application empirique (Liao, Chen & Ni, 2021) :
-Pour la prédiction du log-range minute suivant, le modèle 4-Pairs-Learning 2-LSTM atteint :
-MSE4P-2LSTM=0.56×10−8<MSEGARCH=1.08×10−8\text{MSE}_{\text{4P-2LSTM}} = 0.56 \times 10^{-8} < \text{MSE}_{\text{GARCH}} = 1.08 \times 10^{-8}MSE4P-2LSTM​=0.56×10−8<MSEGARCH​=1.08×10−8
-Réduction d'erreur :
-MSEGARCH−MSE4P-2LSTMMSEGARCH≈48%\frac{\text{MSE}_{\text{GARCH}} - \text{MSE}_{\text{4P-2LSTM}}}{\text{MSE}_{\text{GARCH}}} \approx 48\%MSEGARCH​MSEGARCH​−MSE4P-2LSTM​​≈48%
-Patterns empiriques capturés :
+$$
+f : \mathbb{R}^T \rightarrow \mathbb{R}
+$$
 
-Saisonnalité intraday : Pics de volatilité à 7h (ouverture Londres) et 12h UTC (ouverture NY) :
+(Schäfer & Zimmermann, 2006).
 
-E[Vt∣hour=7]≈1.8×E[Vt∣hour=3]\mathbb{E}[V_t | \text{hour} = 7] \approx 1.8 \times \mathbb{E}[V_t | \text{hour} = 3]E[Vt​∣hour=7]≈1.8×E[Vt​∣hour=3]
+---
 
-Auto-corrélation intra-jour : Avec lag pt=20p_t = 20
-pt​=20 minutes :
+### **Application empirique (Liao, Chen & Ni, 2021)**
 
+Pour la prédiction du log-range minute suivant, le modèle **4-Pairs Learning 2-LSTM** atteint :
 
-Corr(Vt,Vt−k)≈0.5 pour k≤1, deˊcroıˆt rapidement apreˋs\text{Corr}(V_t, V_{t-k}) \approx 0.5 \text{ pour } k \leq 1, \text{ décroît rapidement après}Corr(Vt​,Vt−k​)≈0.5 pour k≤1, deˊcroıˆt rapidement apreˋs
+$$
+\text{MSE}_{\mathrm{4P\text{-}2LSTM}} = 0.56 \times 10^{-8}
+\qquad < \qquad
+\text{MSE}_{\mathrm{GARCH}} = 1.08 \times 10^{-8}
+$$
 
-Auto-corrélation inter-jours : Pour NFP (13h30), avec lag pd=20p_d = 20
-pd​=20 jours (≈1 mois) :
+**Réduction d'erreur :**
 
+$$
+\frac{
+\text{MSE}_{\mathrm{GARCH}} - \text{MSE}_{\mathrm{4P\text{-}2LSTM}}
+}{
+\text{MSE}_{\mathrm{GARCH}}
+}
+\approx 48\%
+$$
 
-Corr(VtD,VtD−20)≈0.3 (max)\text{Corr}(V_t^D, V_t^{D-20}) \approx 0.3 \text{ (max)}Corr(VtD​,VtD−20​)≈0.3 (max)
+---
 
-Corrélations croisées : Entre EURUSD et USDJPY (devise commune USD) :
+## 📌 Patterns empiriques capturés
 
-Corr(VEURUSD,t,VUSDJPY,t)≈0.65\text{Corr}(V_{\text{EURUSD},t}, V_{\text{USDJPY},t}) \approx 0.65Corr(VEURUSD,t​,VUSDJPY,t​)≈0.65
+---
+
+### **1. Saisonnalité intraday**
+
+Pics de volatilité à **7h (Londres)** et **12h UTC (New York)** :
+
+$$
+\mathbb{E}[V_t \mid \text{hour} = 7]
+\;\approx\;
+1.8 \times
+\mathbb{E}[V_t \mid \text{hour} = 3]
+$$
+
+---
+
+### **2. Auto-corrélation intra-jour (lag de 20 minutes)**
+
+$$
+p_t = 20
+$$
+
+$$
+\text{Corr}(V_t, V_{t-k})
+\approx 0.5
+\quad \text{pour } k \leq 1
+$$
+
+Avec décroissance rapide après les premiers lags.
+
+---
+
+### **3. Auto-corrélation inter-jours (NFP, même minute sur 20 jours)**
+
+$$
+p_d = 20
+$$
+
+$$
+\text{Corr}(V_t^{D}, V_t^{D-20})
+\approx 0.3
+$$
+
+(maximum sur la série)
+
+---
+
+### **4. Corrélations croisées entre paires (devise commune USD)**
+
+Entre EURUSD et USDJPY :
+
+$$
+\text{Corr}(V_{\mathrm{EURUSD}, t}, \; V_{\mathrm{USDJPY}, t})
+\approx 0.65
+$$
+
 8.4 Filtre de Régime VIX
 Formalisation :
 It=1{VIXt>EMAn(VIX)t}I_t = \mathbb{1}\{\text{VIX}_t > \text{EMA}_n(\text{VIX})_t\}It​=1{VIXt​>EMAn​(VIX)t​}
