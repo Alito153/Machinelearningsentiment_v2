@@ -412,37 +412,115 @@ $$
 \approx 0.65
 $$
 
-8.4 Filtre de Régime VIX
-Formalisation :
-It=1{VIXt>EMAn(VIX)t}I_t = \mathbb{1}\{\text{VIX}_t > \text{EMA}_n(\text{VIX})_t\}It​=1{VIXt​>EMAn​(VIX)t​}
-Propriété validée empiriquement (Hodges et Sira, 2018) :
-Var[R∣It=1]Var[R∣It=0]≈2.3\frac{\text{Var}[R | I_t = 1]}{\text{Var}[R | I_t = 0]} \approx 2.3Var[R∣It​=0]Var[R∣It​=1]​≈2.3
-Les stratégies momentum/spike profitent davantage en régime It=1I_t = 1
-It​=1, tandis que les stratégies mean-reversion performent en It=0I_t = 0
-It​=0.
+### 8.4 Filtre de Régime VIX
 
-8.5 Overfitting et Deflated Sharpe Ratio
-Probabilité de Backtest Overfitting (PBO) : Pour NN
-N configurations testées, le SR maximum attendu sous H0H_0
-H0​ (données aléatoires) suit :
+**Formalisation :**
 
-E[max⁡i=1,…,NSRi]≈2ln⁡(N)T\mathbb{E}[\max_{i=1,\ldots,N} SR_i] \approx \sqrt{\frac{2\ln(N)}{T}}E[i=1,…,Nmax​SRi​]≈T2ln(N)​​
-Deflated Sharpe Ratio (Bailey & López de Prado, 2014) :
-DSR=Φ((SR−SR0)T−11−γ3SR+γ4−14SR2)DSR = \Phi\left(\frac{(SR - SR_0)\sqrt{T-1}}{\sqrt{1 - \gamma_3 SR + \frac{\gamma_4-1}{4}SR^2}}\right)DSR=Φ​1−γ3​SR+4γ4​−1​SR2​(SR−SR0​)T−1​​​
+Le filtre de régime VIX est défini comme :
+
+$$
+I_t = \mathbb{1}\{ \text{VIX}_t > \text{EMA}_n(\text{VIX})_t \}
+$$
+
 où :
 
-SR0=E[max⁡SR]SR_0 = \mathbb{E}[\max SR]
-SR0​=E[maxSR] sous hypothèse nulle
+- \( I_t = 1 \) signifie **régime de haute volatilité**,  
+- \( I_t = 0 \) signifie **régime normal**.
 
-γ3,γ4\gamma_3, \gamma_4
-γ3​,γ4​ : skewness et kurtosis des retours
+---
 
-Φ(⋅)\Phi(\cdot)
-Φ(⋅) : fonction de répartition normale standard
+### **Validation empirique (Hodges & Sira, 2018)**
 
+La variance des rendements est significativement plus élevée lorsque \( I_t = 1 \) :
 
-Critère de validation : Exiger DSR>0.93DSR > 0.93
-DSR>0.93 (p-value < 5%) pour valider la stratégie.
+$$
+\frac{
+\text{Var}(R \mid I_t = 1)
+}{
+\text{Var}(R \mid I_t = 0)
+}
+\approx 2.3
+$$
+
+**Interprétation :**
+
+- Les stratégies **momentum / spike trading** sont plus performantes lorsque :
+
+$$
+I_t = 1
+$$
+
+- Les stratégies **mean-reversion** sont plus adaptées lorsque :
+
+$$
+I_t = 0
+$$
+
+---
+
+---
+
+### 8.5 Overfitting et Deflated Sharpe Ratio (DSR)
+
+#### **Probabilité d'Overfitting (PBO)**
+
+Pour \( N \) configurations testées, le Sharpe Ratio maximum attendu sous l’hypothèse nulle \( H_0 \) (aucun signal exploitable) suit l’approximation :
+
+$$
+\mathbb{E}\left[ \max_{i=1,\ldots,N} SR_i \right]
+\approx
+\sqrt{ \frac{2 \ln(N)}{T} }
+$$
+
+où :
+
+- \( T \) = nombre d'observations dans le backtest.
+
+---
+
+### **Deflated Sharpe Ratio (Bailey & López de Prado, 2014)**
+
+Le DSR corrige le Sharpe pour :
+
+- la sélection du meilleur modèle parmi \( N \) essais,
+- la non-normalité des rendements (skewness, kurtosis).
+
+La formule du DSR est :
+
+$$
+\text{DSR} =
+\Phi \left(
+\frac{
+(SR - SR_0)\sqrt{T-1}
+}{
+\sqrt{
+1 - \gamma_3 SR +
+\frac{\gamma_4 - 1}{4} SR^2
+}
+}
+\right)
+$$
+
+où :
+
+- \( SR \) = Sharpe Ratio observé,
+- \( SR_0 = \sqrt{\frac{2\ln(N)}{T}} \) = Sharpe maximal attendu sous \( H_0 \),
+- \( \gamma_3 \) = skewness des rendements,
+- \( \gamma_4 \) = kurtosis des rendements,
+- \( \Phi(\cdot) \) = CDF de la loi normale.
+
+---
+
+### **Critère de validation**
+
+Une stratégie est considérée **robuste et non overfittée** si :
+
+$$
+\text{DSR} > 0.93
+$$
+
+(correspond à une p-value < 5%).
+
 
 
 9. Implémentation Technique
